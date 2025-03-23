@@ -2,7 +2,13 @@
 
 A modern, interactive Tic Tac Toe game built with React, TypeScript, and Vite, featuring sleek animations and multiple game modes.
 
-![Tic Tac Toe Screenshot](https://github.com/vaibhavchauhan-15/tic_tac_toe/raw/main/screenshots/gameplay.png)
+## 🎮 Game Preview
+
+### Main Menu
+![Game Menu](https://raw.githubusercontent.com/vaibhavchauhan-15/tic_tac_toe/main/screenshots/menu-screen.png)
+
+### Gameplay
+![Gameplay](https://raw.githubusercontent.com/vaibhavchauhan-15/tic_tac_toe/main/screenshots/gameplay-screen.png)
 
 🎮 **Live Demo**: [Play Tic Tac Toe](https://vaibhav-tic-tac-toe.vercel.app/)
 
