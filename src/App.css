@@ -1030,3 +1030,56 @@
     font-size: 0.9rem;
   }
 }
+
+/* Add keyboard focus styles */
+button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 3px;
+}
+
+.light-mode button:focus-visible {
+  outline: 3px solid rgba(74, 0, 114, 0.5);
+  outline-offset: 3px;
+}
+
+.square:focus-visible {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7), 0 6px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+}
+
+.light-mode .square:focus-visible {
+  box-shadow: 0 0 0 3px rgba(74, 0, 114, 0.5), 0 6px 8px rgba(74, 0, 114, 0.1);
+}
+
+/* Fix input accessibility */
+.name-input:focus-visible {
+  outline: none;
+}
+
+/* High contrast mode support */
+@media (forced-colors: active) {
+  button, .square, .game-container, .name-input, .board {
+    border: 2px solid;
+  }
+  
+  .theme-toggle {
+    border: 2px solid;
+  }
+  
+  .winning-square {
+    border: 3px solid;
+  }
+}
+
+/* Add screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

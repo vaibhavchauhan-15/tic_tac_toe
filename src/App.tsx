@@ -17,6 +17,7 @@ function App() {
   const [showNameForm, setShowNameForm] = useState(false)
   const [player1Name, setPlayer1Name] = useState('')
   const [player2Name, setPlayer2Name] = useState('')
+  const [isLowPerfDevice, setIsLowPerfDevice] = useState(false)
   const boardRef = useRef<HTMLDivElement>(null)
 
   const lines = [
@@ -276,23 +277,33 @@ function App() {
 
   const renderSquare = (index: number) => {
     const isWinningSquare = winningLine?.includes(index)
+    const isMobile = window.innerWidth <= 480
+    const rowIndex = Math.floor(index / 3) + 1
+    const colIndex = (index % 3) + 1
     
     return (
       <motion.button
         className={`square ${board[index] === 'X' ? 'x-mark' : 'o-mark'} ${isWinningSquare ? 'winning-square' : ''}`}
         onClick={() => handleClick(index)}
-        whileHover={!board[index] && !gameOver && gameStarted ? { scale: 1.1 } : {}}
-        whileTap={!board[index] && !gameOver && gameStarted ? { scale: 0.9 } : {}}
-        initial={{ opacity: 0, scale: 0.5 }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            handleClick(index);
+          }
+        }}
+        disabled={!!board[index] || gameOver || !gameStarted}
+        aria-label={`Square ${rowIndex},${colIndex}${board[index] ? ` marked with ${board[index]}` : ''}`}
+        whileHover={!isMobile && !board[index] && !gameOver && gameStarted ? { scale: 1.05 } : {}}
+        whileTap={!board[index] && !gameOver && gameStarted ? { scale: 0.95 } : {}}
+        initial={{ opacity: 0, scale: 0.8 }}
         animate={{ 
           opacity: 1, 
-          scale: isWinningSquare && gameOver ? [1, 1.2, 1] : 1,
-          backgroundColor: isWinningSquare ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.15)',
-          y: isWinningSquare && gameOver ? [0, -10, 0] : 0,
+          scale: isWinningSquare && gameOver ? [1, 1.1, 1] : 1,
+          backgroundColor: isWinningSquare ? 'rgba(255, 255, 255, 0.25)' : undefined,
+          y: isWinningSquare && gameOver && !isMobile ? [0, -5, 0] : 0,
         }}
         transition={{ 
-          duration: 0.3,
-          y: { repeat: isWinningSquare && gameOver ? Infinity : 0, repeatDelay: 0.5 }
+          duration: isMobile ? 0.2 : 0.3,
+          y: { repeat: isWinningSquare && gameOver && !isMobile ? Infinity : 0, repeatDelay: 0.8 }
         }}
       >
         {board[index] && (
@@ -300,13 +311,13 @@ function App() {
             initial={{ scale: 0 }}
             animate={{ 
               scale: 1,
-              rotate: isWinningSquare ? [0, 10, -10, 0] : 0
+              rotate: isWinningSquare && !isMobile ? [0, 8, -8, 0] : 0
             }}
             transition={{ 
               type: "spring",
               stiffness: 260,
               damping: 20,
-              rotate: { repeat: isWinningSquare ? Infinity : 0, repeatDelay: 0.5 }
+              rotate: { repeat: isWinningSquare && !isMobile ? Infinity : 0, repeatDelay: 0.8 }
             }}
           >
             {board[index]}
@@ -350,6 +361,17 @@ function App() {
     };
   }, [winner, winningLine]);
 
+  // Add this effect to detect low performance devices
+  useEffect(() => {
+    // Check for mobile or low-end devices
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isLowEnd = window.navigator.hardwareConcurrency 
+      ? window.navigator.hardwareConcurrency <= 4 
+      : false;
+    
+    setIsLowPerfDevice(isMobile || isLowEnd);
+  }, []);
+
   const status = winner 
     ? `Winner: ${winner === 'X' ? (player1Name || 'Player X') : (player2Name || 'Player O')}` 
     : gameOver 
@@ -358,16 +380,24 @@ function App() {
 
   return (
     <div className={`game-container ${!isDarkMode ? 'light-mode' : ''}`}>
-      {winner && <Confetti width={window.innerWidth} height={window.innerHeight} recycle={false} numberOfPieces={500} />}
+      {winner && <Confetti 
+        width={window.innerWidth} 
+        height={window.innerHeight} 
+        recycle={false} 
+        numberOfPieces={isLowPerfDevice ? 200 : 500}
+        gravity={0.3}
+        tweenDuration={isLowPerfDevice ? 3000 : 5000}
+      />}
       
-      <motion.div
+      <motion.button
         className="theme-toggle"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={toggleTheme}
+        aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
       >
         {isDarkMode ? '☀️' : '🌙'}
-      </motion.div>
+      </motion.button>
       
       <motion.h1 
         className="game-title"
